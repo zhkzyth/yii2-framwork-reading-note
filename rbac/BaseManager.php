@@ -210,16 +210,20 @@ abstract class BaseManager extends Component implements ManagerInterface
      * @return bool the return value of [[Rule::execute()]]. If the auth item does not specify a rule, true will be returned.
      * @throws InvalidConfigException if the auth item has an invalid rule.
      */
+    // Rule可以绑定在Permission，或者绑定在Role，做一些特殊的校验
     protected function executeRule($user, $item, $params)
     {
         if ($item->ruleName === null) {
             return true;
         }
+
         $rule = $this->getRule($item->ruleName);
+
         if ($rule instanceof Rule) {
             return $rule->execute($user, $item, $params);
         } else {
             throw new InvalidConfigException("Rule not found: {$item->ruleName}");
         }
+
     }
 }

@@ -186,12 +186,14 @@ class DbManager extends BaseManager
     protected function checkAccessRecursive($user, $itemName, $params, $assignments)
     {
 
+        // 获取这个权限，可能是role，也可能是permission，谁知道呢
         if (($item = $this->getItem($itemName)) === null) {
             return false;
         }
 
         Yii::trace($item instanceof Role ? "Checking role: $itemName" : "Checking permission: $itemName", __METHOD__);
 
+        // permission 还是 role ?
         if (!$this->executeRule($user, $item, $params)) {
             return false;
         }
@@ -341,16 +343,19 @@ class DbManager extends BaseManager
     protected function addRule($rule)
     {
         $time = time();
+
         if ($rule->createdAt === null) {
             $rule->createdAt = $time;
         }
+
         if ($rule->updatedAt === null) {
             $rule->updatedAt = $time;
         }
+
         $this->db->createCommand()
             ->insert($this->ruleTable, [
                 'name' => $rule->name,
-                'data' => serialize($rule),
+                'data' => serialize($rule), // 为什么要全部序列化进来？
                 'created_at' => $rule->createdAt,
                 'updated_at' => $rule->updatedAt,
             ])->execute();
